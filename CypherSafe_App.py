@@ -72,7 +72,14 @@ def Save():
     
     populate_listbox()
 
+# Flag to track if decryption window is open
+decrypt_window_open = False
+
 def Decrypt():
+    global decrypt_window_open
+    if decrypt_window_open:
+        return
+
     selected_file = file_listbox.get(ANCHOR)
     if selected_file:
         try:
@@ -106,6 +113,17 @@ def Decrypt():
                 text_area = Text(decrypt_window)
                 text_area.insert(END, decrypted_message)
                 text_area.pack()
+
+                # Set the flag to True when the window is created
+                decrypt_window_open = True
+
+                # Define a function to reset the flag when the window is closed
+                def on_close():
+                    global decrypt_window_open
+                    decrypt_window_open = False
+                    decrypt_window.destroy()
+
+                decrypt_window.protocol("WM_DELETE_WINDOW", on_close)
         except FileNotFoundError:
             print(f"File '{selected_file}' not found.")
         except Exception as e:
